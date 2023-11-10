@@ -85,7 +85,7 @@ async update(req, res){
    } 
 
 
-   async deleteID(req, res) {
+   async deleteId(req, res) {
     try {
       const mascota = req.body;
       const ID = parseInt(mascota.id_mascota);
