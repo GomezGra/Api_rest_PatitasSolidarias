@@ -9,13 +9,13 @@ router.get('/mascotas', mascota.getAll);
 router.post('/mascota', mascota.add);
 
 //Solicitud para eliminar
-router.delete('/mascota', mascota.delete);
+//router.delete('/mascota', mascota.delete);
 
 //Solicitud para modificar
 router.put('/mascota', mascota.update);
 
-//Solicitud para mostrar un libro según su id
+//Solicitud para mostrar una mascota según su id
 router.get('/mascota', mascota.getOne);
 
-//Solicitud para eliminar según ISBN
+//Solicitud para eliminar según Id
 router.delete('/mascotaID', mascota.deleteId);

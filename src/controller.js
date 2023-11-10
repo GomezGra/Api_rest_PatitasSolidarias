@@ -20,7 +20,7 @@ async add(req, res) {
       const mascota = req.body;
   
       // guarda los atributos validos
-      const atributosRequeridos = ['nombre', 'edad', 'fecha_ingreso', 'id_tipo_mascota'];
+      const atributosRequeridos = ['nombre', 'edad', 'fecha_ingreso', 'id_tipo_mascota', 'estado'];
       //compara los atributos con los de atributosRequeridos
       const atributosExtra = Object.keys(mascota).filter(attr => !atributosRequeridos.includes(attr));
   
@@ -31,8 +31,8 @@ async add(req, res) {
       }
      
         const [result] = await pool.query(
-          `INSERT INTO mascota (nombre, edad, fecha_ingreso, id_tipo_mascota) VALUES(?, ?, ?, ?)`,
-          [mascota.nombre, mascota.edad, mascota.fecha_ingreso, mascota.id_tipo_mascota]
+          `INSERT INTO mascota (nombre, edad, fecha_ingreso, id_tipo_mascota, estado) VALUES(?, ?, ?, ?, ?)`,
+          [mascota.nombre, mascota.edad, mascota.fecha_ingreso, mascota.id_tipo_mascota, mascota.estado]
         );
         res.json({ "Id insertado": result.insertId });
       }catch (error) {
@@ -41,19 +41,20 @@ async add(req, res) {
   }
 
 
-async delete(req, res){
+/* sync delete(req, res){
     const mascota = req.body; 
     const [result] = await pool.query(`DELETE FROM mascota WHERE id_mascota=(?)`, [mascota.id_mascota]); 
     res.json({"Registros eliminados": result.affectedRows});
 }
-
+ */
 
 
 
 async update(req, res){
   try {
       const mascota = req.body;
-      const [result] = await pool.query(`UPDATE mascota SET nombre=(?), edad=(?), fecha_ingreso=(?), id_tipo_mascota=(?)`,[mascota.nombre, mascota.edad, mascota.fecha_ingreso, mascota.id_tipo_mascota]);
+      const [result] = await pool.query(`UPDATE mascota SET nombre=(?), edad=(?), fecha_ingreso=(?), id_tipo_mascota=(?), estado=(?) WHERE id_mascota=(?)`,[mascota.nombre, mascota.edad, mascota.fecha_ingreso, mascota.id_tipo_mascota, mascota.estado, mascota.id_mascota]);
+      
       if (result.changedRows === 0) {
           throw new Error('No se encontró mascota con el ID proporcionado o los datos proporcionados ya existen.');
       }
@@ -71,7 +72,7 @@ async update(req, res){
                 const mascota = req.body
                 const id = parseInt(mascota.id_mascota);
 
-            const [result] = await pool.query('SELECT * FROM mascota WHERE id_mascota = ?', [id_mascota]);
+            const [result] = await pool.query('SELECT * FROM mascota WHERE id_mascota = ?', [id]);
             if (result [0]!= undefined) {
                 res.json(result);
             } else {
@@ -84,21 +85,23 @@ async update(req, res){
    } 
 
 
-async deleteId(req, res){
-    const mascota = req.body; 
-    const id_mascota = parseInt(mascota.id_mascota);
-
-    try{ 
-    if ([id_mascota] != undefined) {
-        return res.json({ error: `Atributos invalido: No se encontro la mascota con el id especificado` });
-    }
-    const [result] = await pool.query(`DELETE FROM mascota WHERE id_mascota=(?)`, [id_mascota]);
-        res.json({"Registros eliminados": result.affectedRows});
-
+   async deleteID(req, res) {
+    try {
+      const mascota = req.body;
+      const ID = parseInt(mascota.id_mascota);
+  
+      const [result] = await pool.query(`DELETE FROM mascota WHERE id_mascota = ?`, [ID]);
+  
+      if (result.affectedRows === 0) {
+        return res.json({ "error": "No se encontró la mascota con el id indicado" });
+      } else {
+        res.json({ "Registros eliminados": result.affectedRows });
+      }
     } catch (e) {
-        console.log(e);
-               }
-   }
+      console.log(e);
+      res.status(500).json({ "error": "Error en el servidor" });
+    }
+  }
 }
 
 
